@@ -340,11 +340,12 @@ B1_sum <- data %>%
   mutate(pct = n / sum(n) * 100)
 ggplot(B1_sum, aes(x = B1, y = pct, fill = B1)) +
   geom_col(width = 0.6) +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "%\n(n = ", n, ")")),
             vjust = -0.5, size = 4) +
   labs(
     title = "Pemilikan Simpanan dalam Kalangan Pelajar",
-    x = NULL, y = "Peratus (%)"
+    x = NULL, 
+    y = "Peratus (%)"
   ) +
   theme_minimal() +
   theme(legend.position = "none")
@@ -353,29 +354,45 @@ ggplot(B1_sum, aes(x = B1, y = pct, fill = B1)) +
 B2_sum <- data %>%
   count(B2) %>%
   mutate(pct = n / sum(n) * 100)
-ggplot(B2_sum, aes(x = B2, y = pct, fill = B2)) +
+
+
+df_konsisten <- data %>%
+  filter(B1 == "Ya") %>%   # pastikan ejaan sama
+  count(B2) %>%
+  mutate(
+    pct = n / sum(n) * 100
+  )
+
+df_konsisten
+
+ggplot(df_konsisten, aes(x = B2, y = pct, fill = B2)) +
   geom_col(width = 0.6) +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "%\n(n = ", n, ")")),
             vjust = -0.5, size = 4) +
   labs(
-    title = "Konsistensi Amalan Menyimpan Wang",
-    x = NULL, y = "Peratus (%)"
+    title = "Konsistensi Simpanan dalam Kalangan Pelajar yang Mempunyai Simpanan",
+    x = NULL,
+    y = "Peratus (%)"
   ) +
   theme_minimal() +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  expand_limits(y = max(df_konsisten$pct) + 5)
+
 
 B3_sum <- data %>%
   count(B3) %>%
   mutate(pct = n / sum(n) * 100)
 ggplot(B3_sum, aes(x = B3, y = pct)) +
   geom_col(fill = "#2C7FB8", width = 0.7) +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "%\n(n = ", n, ")")),
             vjust = -0.5, size = 3.8) +
   labs(
     title = "Anggaran Jumlah Simpanan Bulanan Pelajar",
-    x = "Julat Anggaran Simpanan", y = "Peratus (%)"
+    x = "Julat Anggaran Simpanan", 
+    y = "Peratus (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  expand_limits(y = max(B3_sum$pct) + 5)
 
 
 B4_freq <- colSums(data[, c(
@@ -385,6 +402,7 @@ B4_freq <- colSums(data[, c(
   "B4_pelaburan",
   "B4_ibu_bapa"
 )], na.rm = TRUE)
+# Buat dataframe
 B4_df <- tibble(
   Cara = c(
     "Akaun Bank",
@@ -395,17 +413,19 @@ B4_df <- tibble(
   ),
   Bilangan = as.numeric(B4_freq)
 ) %>%
-  mutate(pct = Bilangan / nrow(data) * 100)
+  mutate(pct = Bilangan / 429 * 100)
 ggplot(B4_df, aes(x = reorder(Cara, pct), y = pct)) +
   geom_col(fill = "#41AE76") +
   coord_flip() +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "% (n = ", Bilangan, ")")),
             hjust = -0.1, size = 3.6) +
   labs(
     title = "Kaedah Simpanan Wang Pelajar",
-    x = NULL, y = "Peratus (%)"
+    x = NULL, 
+    y = "Peratus (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  expand_limits(y = max(B4_df$pct) + 5)
 
 B5_sum <- data %>%
   count(B5) %>%
@@ -413,26 +433,31 @@ B5_sum <- data %>%
 ggplot(B5_sum, aes(x = reorder(B5, pct), y = pct)) +
   geom_col(fill = "#DD1C77") +
   coord_flip() +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "% (n = ", n, ")")),
             hjust = -0.1, size = 3.6) +
   labs(
     title = "Tujuan Utama Menyimpan Wang",
-    x = NULL, y = "Peratus (%)"
+    x = NULL, 
+    y = "Peratus (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  expand_limits(y = max(B5_sum$pct) + 5)
 
 B6_sum <- data %>%
   count(B6) %>%
   mutate(pct = n / sum(n) * 100)
 ggplot(B6_sum, aes(x = B6, y = pct)) +
   geom_col(fill = "#756BB1", width = 0.7) +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "%\n(n = ", n, ")")),
             vjust = -0.5, size = 3.8) +
   labs(
     title = "Tempoh Pelajar Menyimpan Wang",
-    x = "Tempoh", y = "Peratus (%)"
+    x = "Tempoh", 
+    y = "Peratus (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  expand_limits(y = max(B6_sum$pct) + 5)
+
 
 data$B7_kecantikan <- ifelse(grepl("Penjagaan diri/kecantikan", data$B7), 1, 0)
 data$B7_beli       <- ifelse(grepl("Membeli-belah", data$B7), 1, 0)
@@ -452,7 +477,7 @@ B7_freq <- colSums(data[, c(
   "B7_sukan"
 )], na.rm = TRUE)
 
-B7_pct <- round(B7_freq / nrow(data) * 100, 1)
+B7_pct <- round(B7_freq / 779 * 100, 1)
 
 tbl_belanja <- tibble(
   Kategori_Perbelanjaan = c(
@@ -473,35 +498,95 @@ ggplot(tbl_belanja,
            y = Peratus)) +
   geom_col(fill = "#2CA25F") +
   coord_flip() +
-  geom_text(aes(label = paste0(Peratus, "%")),
+  geom_text(aes(label = paste0(Peratus, "%\n(n = ", Bilangan, ")")),
             hjust = -0.1, size = 3.8) +
   labs(
     title = "Corak Perbelanjaan Pelajar UKM",
     x = NULL,
     y = "Peratus (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  expand_limits(y = max(tbl_belanja$Peratus) + 5)
 
-tbl_status <- data %>%
-  tabyl(B8) %>%
-  adorn_totals("row") %>%
-  adorn_pct_formatting(digits = 1)
-tbl_status
+
+b7_cols <- c("B7_kecantikan","B7_beli","B7_akademik",
+             "B7_hiburan","B7_angkutan","B7_telco","B7_sukan")
+
+b7_labels <- c(
+  B7_kecantikan = "Penjagaan diri/kecantikan",
+  B7_beli       = "Membeli-belah",
+  B7_akademik   = "Pengajian/akademik",
+  B7_hiburan    = "Hiburan",
+  B7_angkutan   = "Pengangkutan",
+  B7_telco      = "Tambah nilai telefon/data",
+  B7_sukan      = "Sukan"
+)
+
+b7_long <- data %>%
+  select(A1, all_of(b7_cols)) %>%                    
+  pivot_longer(cols = all_of(b7_cols),
+               names_to = "Kategori", values_to = "Pilih") %>%
+  filter(Pilih == 1) %>%
+  mutate(Kategori = recode(Kategori, !!!b7_labels))
+tbl_compare <- b7_long %>%
+  count(Kategori, A1, name = "n") %>%
+  pivot_wider(names_from = A1, values_from = n, values_fill = 0) %>%
+  mutate(Ntotal = rowSums(across(where(is.numeric)))) %>%   # jumlah semua jantina
+  arrange(desc(Ntotal))
 
 B8_sum <- data %>%
   count(B8) %>%
   mutate(pct = n / sum(n) * 100)
 ggplot(B8_sum, aes(x = B8, y = pct)) +
   geom_col(fill = "#3182BD", width = 0.7) +
-  geom_text(aes(label = paste0(round(pct,1), "%")),
+  geom_text(aes(label = paste0(round(pct,1), "%\n(n = ", n, ")")),
             vjust = -0.5, size = 3.8) +
   labs(
     title = "Status Simpanan dan Perbelanjaan Pelajar UKM",
     x = NULL,
     y = "Peratus (%)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  expand_limits(y = max(B8_sum$pct) + 5)
 
+df_compare <- data %>%
+  filter(B1 == "Ya") %>%
+  mutate(
+    Konsisten = B2,
+    Status = case_when(
+      str_detect(B8, "<") | str_detect(str_to_lower(B8), "kurang") ~ "Simpanan < Perbelanjaan",
+      str_detect(B8, ">") | str_detect(str_to_lower(B8), "lebih")  ~ "Simpanan > Perbelanjaan",
+      str_detect(B8, "=") | str_detect(str_to_lower(B8), "sama")  ~ "Simpanan = Perbelanjaan",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(Status)) %>%
+  count(Konsisten, Status) %>%
+  group_by(Konsisten) %>%
+  mutate(
+    pct = n / sum(n) * 100
+  ) %>%
+  ungroup()
+
+ggplot(df_compare, aes(x = Konsisten, y = pct, fill = Status)) +
+  geom_col(width = 0.6) +
+  geom_text(
+    aes(label = paste0(round(pct,1), "%\n(n = ", n, ")")),
+    position = position_stack(vjust = 0.5),
+    color = "white", size = 3.5
+  ) +
+  scale_fill_manual(values = c(
+    "Simpanan < Perbelanjaan" = "#E34A33",
+    "Simpanan = Perbelanjaan" = "#9E9E9E",
+    "Simpanan > Perbelanjaan" = "#31A354"
+  )) +
+  labs(
+    title = "Perbandingan Status Simpanan Mengikut Konsistensi Amalan Menyimpan",
+    x = "Konsistensi Menyimpan",
+    y = "Peratus (%)"
+  ) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
 
 ### ANALISIS OBJEKTIF 2 ###
 
@@ -552,8 +637,7 @@ dunn.test(data$B8_num, data$D6, method = "bonferroni")
 ### ANALISIS OBJEKTIF 3 ###
 
 # 1. LOAD LIBRARY
-library(tidyverse)
-library(janitor)
+
 library(seminr)
 
   clean_data <- data %>%
